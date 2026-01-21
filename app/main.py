@@ -1,18 +1,14 @@
 from fastapi import FastAPI
-from dishka import Provider, Scope, make_container
-
+from dishka.integrations.fastapi import setup_dishka
 from app.endpoints import users
+from app.container import lifespan, get_container
 
-from app.services.user_service import UserService
 
-service_provider = Provider(scope=Scope.APP)
-service_provider.provide(UserService)
-
-container = make_container(service_provider)
-
-app = FastAPI(title="GSM Controller")
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(users.router)
+
+setup_dishka(container=get_container(), app=app)
 
 @app.get("/")
 def root():
